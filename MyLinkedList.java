@@ -3,10 +3,12 @@ public class MyLinkedList {
     // Node class
     private class Node {
         int data;
+        int weight;
         Node next;
 
         public Node(int data) {
             this.data = data;
+            this.weight = 0;
             this.next = null;
         }
     }
@@ -85,6 +87,17 @@ public class MyLinkedList {
         return false;
     }
 
+    // Increase the weight
+    public void increaseWeight() {
+
+        Node current = head;
+
+        while (current != null) {
+            current.weight++;   // increase weight when visited
+            current = current.next;
+        }
+    }
+    
     // Print the list
     public void printList() {
 
@@ -98,4 +111,3 @@ public class MyLinkedList {
         System.out.println("null");
     }
 }
-
