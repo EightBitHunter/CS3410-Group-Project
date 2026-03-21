@@ -13,8 +13,6 @@ import java.util.Random;
     }
     
     public static void main(String args[]){
-        MyLinkedList list = new MyLinkedList();
-
         //create open and closed table lists
         MyLinkedList<Table> openTables = new MyLinkedList<>();
         MyLinkedList<Table> closedTables = new MyLinkedList<>();
@@ -24,8 +22,11 @@ import java.util.Random;
         for (int i = 0; i < 40; i++){
             int seats = rand.nextInt(8) + 1;
             Table table = new Table(seats);
-            openTables.add(table);
+            openTables.add(seats);
         }
+        //print open tables
+        System.out.println("Open tables:");
+        openTables.printList();
 
         list.add(10);
         list.add(20);
