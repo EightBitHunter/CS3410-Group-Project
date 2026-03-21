@@ -1,12 +1,12 @@
-public class MyLinkedList {
+public class MyLinkedList<T> {
 
     // Node class
     private class Node {
-        int data;
+        T data;
         int weight;
         Node next;
 
-        public Node(int data) {
+        public Node(T data) {
             this.data = data;
             this.weight = 0;
             this.next = null;
@@ -21,7 +21,7 @@ public class MyLinkedList {
     }
 
     // Add to end of list
-    public void add(int data) {
+    public void add(T data) {
         Node newNode = new Node(data);
 
         if (head == null) {
@@ -39,14 +39,14 @@ public class MyLinkedList {
     }
 
     // Add to beginning
-    public void addFirst(int data) {
+    public void addFirst(T data) {
         Node newNode = new Node(data);
         newNode.next = head;
         head = newNode;
     }
 
     // Remove a value
-    public void remove(int data) {
+    public void remove(T data) {
 
         if (head == null) {
             return;
@@ -61,7 +61,7 @@ public class MyLinkedList {
 
         while (current.next != null) {
 
-            if (current.next.data == data) {
+            if (current.next.data.equals == data) {
                 current.next = current.next.next;
                 return;
             }
@@ -71,7 +71,7 @@ public class MyLinkedList {
     }
 
     // Check if value exists
-    public boolean contains(int data) {
+    public boolean contains(T data) {
 
         Node current = head;
 
