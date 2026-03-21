@@ -110,4 +110,20 @@ public class MyLinkedList {
 
         System.out.println("null");
     }
+
+    // See if list is empty
+    public boolean isEmpty() {
+        return head == null;
+    }
+
+    //Find seat size of a usable table
+    public int check(int partySize){
+        Node current = head;
+        while (current != null){
+            if (current.data >= partySize){
+                //if table is found
+                return current.data;
+            }
+
+        return -1 //if no table is found
 }
