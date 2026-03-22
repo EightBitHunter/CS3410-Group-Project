@@ -1,21 +1,19 @@
 package project;
 
-public class Table {
-	private int tblNmbr;
+public class Table{
+	private int tblNum;
 	private int size;
-	private boolean occupied;
 	
-	public Table(int number, int size) {
-		this.tblNmbr = number;
+	public Table(int num, int size) {
+		this.tblNum = num;
 		this.size = size;
-		this.occupied = false;
 	}
 	
-	public int getTblNmbr(){
-		return this.tblNmbr;
+	public int getTblNum(){
+		return this.tblNum;
 	}
-	public void setTblNmbr(int tblNmbr) {
-		this.tblNmbr = tblNmbr;
+	public void setTblNum(int tblNmbr) {
+		this.tblNum = tblNmbr;
 	}
 	
 	public int getSize() {
@@ -25,10 +23,20 @@ public class Table {
 		this.size = size;
 	}
 	
-	public boolean isOccupied() {
-		return this.occupied;
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) {
+	    	return true;
+	    }
+	    if (!(o instanceof Table)) {
+	    	return false;
+	    }
+	    Table other = (Table) o;
+	    return this.tblNum == other.tblNum;
 	}
-	public void setOccupied(boolean status) {
-		this.occupied = status; 
+	
+	public String toString() {
+		String msg = "Table " + getTblNum();
+		return msg;
 	}
 }

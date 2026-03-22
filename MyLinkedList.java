@@ -1,12 +1,14 @@
-public class MyLinkedList<T> {
+package project;
+
+public class MyLinkedList {
 
     // Node class
     private class Node {
-        T data;
+        Object data;
         int weight;
         Node next;
 
-        public Node(T data) {
+        public Node(Object data) {
             this.data = data;
             this.weight = 0;
             this.next = null;
@@ -21,7 +23,7 @@ public class MyLinkedList<T> {
     }
 
     // Add to end of list
-    public void add(T data) {
+    public void add(Object data) {
         Node newNode = new Node(data);
 
         if (head == null) {
@@ -39,20 +41,20 @@ public class MyLinkedList<T> {
     }
 
     // Add to beginning
-    public void addFirst(T data) {
+    public void addFirst(Object data) {
         Node newNode = new Node(data);
         newNode.next = head;
         head = newNode;
     }
 
     // Remove a value
-    public void remove(T data) {
+    public void remove(Object data) {
 
         if (head == null) {
             return;
         }
 
-        if (head.data == data) {
+        if (head.data.equals(data)) {
             head = head.next;
             return;
         }
@@ -61,7 +63,7 @@ public class MyLinkedList<T> {
 
         while (current.next != null) {
 
-            if (current.next.data.equals == data) {
+            if (current.next.data.equals(data)) {
                 current.next = current.next.next;
                 return;
             }
@@ -69,9 +71,29 @@ public class MyLinkedList<T> {
             current = current.next;
         }
     }
+    
+    public Object get(int index) {
+
+        if (index < 0) {
+            throw new IndexOutOfBoundsException("Index cannot be negative");
+        }
+
+        Node current = head;
+        int count = 0;
+
+        while (current != null) {
+            if (count == index) {
+                return current.data;
+            }
+            current = current.next;
+            count++;
+        }
+
+        throw new IndexOutOfBoundsException("Index out of range");
+    }
 
     // Check if value exists
-    public boolean contains(T data) {
+    public boolean contains(Object data) {
 
         Node current = head;
 
@@ -85,6 +107,18 @@ public class MyLinkedList<T> {
         }
 
         return false;
+    }
+    
+    public int size() {
+        int count = 0;
+        Node current = head;
+
+        while (current != null) {
+            count++;
+            current = current.next;
+        }
+
+        return count;
     }
 
     // Increase the weight
@@ -110,20 +144,4 @@ public class MyLinkedList<T> {
 
         System.out.println("null");
     }
-
-    // See if list is empty
-    public boolean isEmpty() {
-        return head == null;
-    }
-
-    //Find seat size of a usable table
-    public int check(int partySize){
-        Node current = head;
-        while (current != null){
-            if (current.data >= partySize){
-                //if table is found
-                return current.data;
-            }
-
-        return -1 //if no table is found
 }
