@@ -144,4 +144,20 @@ public class MyLinkedList {
 
         System.out.println("null");
     }
+
+    public Table checkTable(int partysize){
+        Node current = head;
+
+        while (current != null){
+            Table table = (Table)current.data;
+
+            //find first open table with enough seats
+            if(table.getSize() >= partySize){
+                return table;
+            }
+
+            current = current.next;
+        }
+
+        return null;
 }
