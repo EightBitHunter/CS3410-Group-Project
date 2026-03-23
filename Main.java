@@ -1,48 +1,51 @@
-public class Main{
+package project;
 import java.util.Random;
-    public static MyLinkedList randTbls(int num, boolean open){
-        MyLinkedList tbls = new MyLinkedList();
+
+public class Main{
+    public static MyLinkedList<Table> randTbls(int num){
+        MyLinkedList<Table> tbls = new MyLinkedList<>();
         Random rand = new Random();
+        
         for(int i = 0; i < num; i++){
-            Table tbl = new Table(i + 1, rand.nextInt(8) + 1);
-            if(!open){
-                tbl.occupy();
-            }
+        	
+        	int size = rand.nextInt(8) + 1;
+            Table tbl = new Table(i + 1, size);
+            
             tbls.add(tbl);
         }
+        
+        return tbls;
     }
     
     public static void main(String args[]){
+    	
+    	Random rand = new Random();
+    	
         //create open and closed table lists
-        MyLinkedList<Table> openTables = new MyLinkedList<>();
+        MyLinkedList<Table> openTables = randTbls(40);
         MyLinkedList<Table> closedTables = new MyLinkedList<>();
-
-        Random rand = new Random();
-        //fill openTables with random seats
-        for (int i = 0; i < 40; i++){
-            int seats = rand.nextInt(8) + 1;
-            Table table = new Table(seats);
-            openTables.add(seats);
-        }
-        //print open tables
-        System.out.println("Open tables:");
+        
+        System.out.println("We're open for business!");
+        System.out.println("\nOpen Tables: ");
         openTables.printList();
 
-        list.add(10);
-        list.add(20);
-        list.add(30);
-
-        list.addFirst(5);
-        list.printList();
-
-        list.remove(20);
-
-        list.printList();
+        //TableManager Creation
+        TableManager manager = new TableManager(openTables, closedTables);
         
-        System.out.println("Contains 30?" + list.contains(30));
+        //random parties from size 1 - 15
+        for (int i = 0; i < 20; i++) {
 
-        MyLinkedList openTbls = randTbls(40, true);
-        MyLinkedList closeTbls = randTbls(40, false);
+            int partySize = rand.nextInt(15) + 1;
+            manager.seatParty(partySize);
+        }
+        
+        //end of simulation
+        System.out.println("\n---- Results ----");
+        System.out.println("Final Open Tables: ");
+        openTables.printList();
+        
+        System.out.println("Final Closed Tables: ");
+        closedTables.printList();
 
     }
 }

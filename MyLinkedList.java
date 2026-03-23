@@ -1,14 +1,14 @@
 package project;
 
-public class MyLinkedList {
+public class MyLinkedList<T> {
 
     // Node class
     private class Node {
-        Object data;
+        T data;
         int weight;
         Node next;
 
-        public Node(Object data) {
+        public Node(T data) {
             this.data = data;
             this.weight = 0;
             this.next = null;
@@ -23,7 +23,7 @@ public class MyLinkedList {
     }
 
     // Add to end of list
-    public void add(Object data) {
+    public void add(T data) {
         Node newNode = new Node(data);
 
         if (head == null) {
@@ -41,14 +41,14 @@ public class MyLinkedList {
     }
 
     // Add to beginning
-    public void addFirst(Object data) {
+    public void addFirst(T data) {
         Node newNode = new Node(data);
         newNode.next = head;
         head = newNode;
     }
 
     // Remove a value
-    public void remove(Object data) {
+    public void remove(T data) {
 
         if (head == null) {
             return;
@@ -72,7 +72,7 @@ public class MyLinkedList {
         }
     }
     
-    public Object get(int index) {
+    public T get(int index) {
 
         if (index < 0) {
             throw new IndexOutOfBoundsException("Index cannot be negative");
@@ -93,13 +93,13 @@ public class MyLinkedList {
     }
 
     // Check if value exists
-    public boolean contains(Object data) {
+    public boolean contains(T data) {
 
         Node current = head;
 
         while (current != null) {
 
-            if (current.data == data) {
+            if (current.data.equals(data)) {
                 return true;
             }
 
@@ -149,15 +149,20 @@ public class MyLinkedList {
         Node current = head;
 
         while (current != null){
-            Table table = (Table)current.data;
-
-            //find first open table with enough seats
-            if(table.getSize() >= partySize){
-                return table;
-            }
+        	
+        	if(current.data instanceof Table) {
+        		Table table = (Table)current.data;
+        		
+        		//find first open table with enough seats
+        		if(table.getSize() >= partysize){
+                    return table;
+                }
+        	}
+       
 
             current = current.next;
         }
 
         return null;
+    }
 }
