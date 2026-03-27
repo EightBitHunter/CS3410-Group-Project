@@ -1,16 +1,19 @@
 import java.util.Random;
 import java.util.Scanner;
 public class Main{
-    public static MyLinkedList randTbls(int num, boolean open){
+    public static MyLinkedList randTbls(int num){
         MyLinkedList tbls = new MyLinkedList();
         Random rand = new Random();
+        
         for(int i = 0; i < num; i++){
-            Table tbl = new Table(i + 1, rand.nextInt(8) + 1);
-            if(!open){
-                tbl.occupy();
-            }
+        	
+        	int size = rand.nextInt(8) + 1;
+            Table tbl = new Table(i + 1, size);
+            
             tbls.add(tbl);
         }
+        
+        return tbls;
     }
     
     public static void main(String args[]){
@@ -80,5 +83,4 @@ public class Main{
         // MyLinkedList openTbls = randTbls(40, true);
         // MyLinkedList closeTbls = randTbls(40, false);
 
-    }
 }
