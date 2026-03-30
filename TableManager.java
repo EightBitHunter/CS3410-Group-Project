@@ -91,9 +91,10 @@ public class TableManager {
 	public void freeTable(int num) {
 		for(int i = 0; i < closeTbls.size(); i++) {
 			Table t = (Table) closeTbls.get(i);
-			if(t != null) {
+			if(t != null && t.getTblNum() == num) {
 				openTbls.add(t);
 				closeTbls.remove(t);
+				break;
 			}
 		}
 	}
