@@ -8,9 +8,9 @@ public class MyLinkedList {
         int weight;
         Node next;
 
-        public Node(Object data) {
+        public Node(Object data, int weight) {
             this.data = data;
-            this.weight = 0;
+            this.weight = weight;
             this.next = null;
         }
     }
