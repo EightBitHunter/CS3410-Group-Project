@@ -1,12 +1,12 @@
-package project;
-
 public class Table{
 	private int tblNum;
 	private int size;
+	private double weight;
 	
-	public Table(int num, int size) {
+	public Table(int num, int size, double weight) {
 		this.tblNum = num;
 		this.size = size;
+		this.weight = weight;
 	}
 	
 	public int getTblNum(){
@@ -21,6 +21,13 @@ public class Table{
 	}
 	public void setSize(int size) {
 		this.size = size;
+	}
+
+	public double getWeight(){
+		return this.weight;
+	}
+	public void setWeight(double weight){
+		this.weight = weight;
 	}
 	
 	@Override
