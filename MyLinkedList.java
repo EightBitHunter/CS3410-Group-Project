@@ -1,16 +1,14 @@
 package project;
 
-public class MyLinkedList<T> {
+public class MyLinkedList {
 
     // Node class
     private class Node {
-        T data;
-        int weight;
+        Object data;
         Node next;
 
-        public Node(T data) {
+        public Node(Object data) {
             this.data = data;
-            this.weight = 0;
             this.next = null;
         }
     }
@@ -23,7 +21,7 @@ public class MyLinkedList<T> {
     }
 
     // Add to end of list
-    public void add(T data) {
+    public void add(Object data) {
         Node newNode = new Node(data);
 
         if (head == null) {
@@ -41,14 +39,14 @@ public class MyLinkedList<T> {
     }
 
     // Add to beginning
-    public void addFirst(T data) {
+    public void addFirst(Object data) {
         Node newNode = new Node(data);
         newNode.next = head;
         head = newNode;
     }
 
     // Remove a value
-    public void remove(T data) {
+    public void remove(Object data) {
 
         if (head == null) {
             return;
@@ -72,7 +70,7 @@ public class MyLinkedList<T> {
         }
     }
     
-    public T get(int index) {
+    public Object get(int index) {
 
         if (index < 0) {
             throw new IndexOutOfBoundsException("Index cannot be negative");
@@ -93,13 +91,13 @@ public class MyLinkedList<T> {
     }
 
     // Check if value exists
-    public boolean contains(T data) {
+    public boolean contains(Object data) {
 
         Node current = head;
 
         while (current != null) {
 
-            if (current.data.equals(data)) {
+            if (current.data == data) {
                 return true;
             }
 
@@ -121,16 +119,7 @@ public class MyLinkedList<T> {
         return count;
     }
 
-    // Increase the weight
-    public void increaseWeight() {
-
-        Node current = head;
-
-        while (current != null) {
-            current.weight++;   // increase weight when visited
-            current = current.next;
-        }
-    }
+//moved weight to the table class
     
     // Print the list
     public void printList() {
@@ -149,20 +138,17 @@ public class MyLinkedList<T> {
         Node current = head;
 
         while (current != null){
-        	
-        	if(current.data instanceof Table) {
-        		Table table = (Table)current.data;
-        		
-        		//find first open table with enough seats
-        		if(table.getSize() >= partysize){
-                    return table;
-                }
-        	}
-       
+            Table table = (Table)current.data;
+
+            //find first open table with enough seats
+            if(table.getSize() >= partysize){
+                return table;
+            }
 
             current = current.next;
         }
 
         return null;
-    }
+}
+
 }

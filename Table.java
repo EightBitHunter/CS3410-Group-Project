@@ -3,6 +3,7 @@ package project;
 public class Table{
 	private int tblNum;
 	private int size;
+	private int weight = 0;
 	
 	public Table(int num, int size) {
 		this.tblNum = num;
@@ -21,6 +22,12 @@ public class Table{
 	}
 	public void setSize(int size) {
 		this.size = size;
+	}
+	public int getWeight() {
+		return weight;
+	}
+	public void setWeight(int weight) {
+		this.weight = weight;
 	}
 	
 	@Override
