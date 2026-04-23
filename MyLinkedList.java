@@ -2,27 +2,22 @@ package project;
 
 public class MyLinkedList {
 
-    // Node class
     private class Node {
         Object data;
-        int weight;
         Node next;
 
-        public Node(Object data, int weight) {
+        public Node(Object data) {
             this.data = data;
-            this.weight = weight;
             this.next = null;
         }
     }
 
-    private Node head;   // first node in the list
+    private Node head;
 
-    // Constructor
     public MyLinkedList() {
         head = null;
     }
 
-    // Add to end of list
     public void add(Object data) {
         Node newNode = new Node(data);
 
@@ -40,16 +35,13 @@ public class MyLinkedList {
         current.next = newNode;
     }
 
-    // Add to beginning
     public void addFirst(Object data) {
         Node newNode = new Node(data);
         newNode.next = head;
         head = newNode;
     }
 
-    // Remove a value
     public void remove(Object data) {
-
         if (head == null) {
             return;
         }
@@ -62,7 +54,6 @@ public class MyLinkedList {
         Node current = head;
 
         while (current.next != null) {
-
             if (current.next.data.equals(data)) {
                 current.next = current.next.next;
                 return;
@@ -71,11 +62,10 @@ public class MyLinkedList {
             current = current.next;
         }
     }
-    
-    public Object get(int index) {
 
+    public Object get(int index) {
         if (index < 0) {
-            throw new IndexOutOfBoundsException("Index cannot be negative");
+            throw new IndexOutOfBoundsException();
         }
 
         Node current = head;
@@ -85,21 +75,19 @@ public class MyLinkedList {
             if (count == index) {
                 return current.data;
             }
+
             current = current.next;
             count++;
         }
 
-        throw new IndexOutOfBoundsException("Index out of range");
+        throw new IndexOutOfBoundsException();
     }
 
-    // Check if value exists
     public boolean contains(Object data) {
-
         Node current = head;
 
         while (current != null) {
-
-            if (current.data == data) {
+            if (current.data.equals(data)) {
                 return true;
             }
 
@@ -108,7 +96,7 @@ public class MyLinkedList {
 
         return false;
     }
-    
+
     public int size() {
         int count = 0;
         Node current = head;
@@ -121,20 +109,7 @@ public class MyLinkedList {
         return count;
     }
 
-    // Increase the weight
-    public void increaseWeight() {
-
-        Node current = head;
-
-        while (current != null) {
-            current.weight++;   // increase weight when visited
-            current = current.next;
-        }
-    }
-    
-    // Print the list
     public void printList() {
-
         Node current = head;
 
         while (current != null) {
@@ -145,14 +120,13 @@ public class MyLinkedList {
         System.out.println("null");
     }
 
-    public Table checkTable(int partysize){
+    public Table checkTable(int partySize) {
         Node current = head;
 
-        while (current != null){
-            Table table = (Table)current.data;
+        while (current != null) {
+            Table table = (Table) current.data;
 
-            //find first open table with enough seats
-            if(table.getSize() >= partySize){
+            if (table.getSize() >= partySize) {
                 return table;
             }
 
@@ -160,4 +134,6 @@ public class MyLinkedList {
         }
 
         return null;
+    }
 }
+
