@@ -88,3 +88,27 @@
     -fx-border-color: #2563eb;
     -fx-border-width: 4;
 }
+
+.timer-green {
+    -fx-text-fill: #15803d;
+    -fx-font-weight: bold;
+}
+
+.timer-yellow {
+    -fx-text-fill: #ca8a04;
+    -fx-font-weight: bold;
+}
+
+.timer-red {
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+}
+
+.timer-empty {
+    -fx-text-fill: #6b7280;
+    -fx-font-style: italic;
+}
+
+.label {
+    -fx-text-fill: black;
+}

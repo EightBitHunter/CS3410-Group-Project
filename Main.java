@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +21,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
+import java.time.LocalDateTime;
 
 public class Main extends Application {
 
@@ -158,34 +164,52 @@ public class Main extends Application {
 
 		TextField tableSeatsField = new TextField();
 		tableSeatsField.setPromptText("Seats for new table");
+		TextField tableQuantityField = new TextField();
+		tableQuantityField.setPromptText("How many tables?");
 
 		Button addTableButton = new Button("Add Table");
 		addTableButton.setMaxWidth(Double.MAX_VALUE);
 		addTableButton.setOnAction(e -> {
-			String text = tableSeatsField.getText().trim();
+			String seatsText = tableSeatsField.getText().trim();
+			String quantityText = tableQuantityField.getText().trim();
 
-			if (text.isEmpty()) {
+			if (seatsText.isEmpty()) {
 				statusLabel.setText("Enter the number of seats for the new table.");
 				return;
 			}
 
+			if (quantityText.isEmpty()) {
+				statusLabel.setText("Enter how many tables to create.");
+				return;
+			}
+
 			try {
-				int seats = Integer.parseInt(text);
+				int seats = Integer.parseInt(seatsText);
+				int quantity = Integer.parseInt(quantityText);
 
 				if (seats <= 0) {
 					statusLabel.setText("Table seats must be greater than 0.");
 					return;
 				}
 
-				Table newTable = new Table(nextTableNumber++, seats);
-				tableManager.addTable(newTable);
+				if (quantity <= 0) {
+					statusLabel.setText("Table quantity must be greater than 0.");
+					return;
+				}
+
+				for (int i = 0; i < quantity; i++) {
+					Table newTable = new Table(nextTableNumber++, seats);
+					tableManager.addTable(newTable);
+				}
 
 				tableSeatsField.clear();
-				statusLabel.setText("Added Table " + newTable.getTblNum() + " with " + seats + " seats.");
+				tableQuantityField.clear();
+
+				statusLabel.setText("Added " + quantity + " table(s) with " + seats + " seats each.");
 				refreshUI();
 
 			} catch (NumberFormatException ex) {
-				statusLabel.setText("Table seats must be a number.");
+				statusLabel.setText("Seats and quantity must both be numbers.");
 			}
 		});
 
@@ -195,20 +219,54 @@ public class Main extends Application {
 			List<Integer> openSelections = getSelectedOpenTableNumbers();
 
 			if (openSelections.isEmpty()) {
-				statusLabel.setText("Select an open table to delete.");
+				statusLabel.setText("Select one or more open tables to delete.");
 				return;
 			}
 
-			if (openSelections.size() > 1) {
-				statusLabel.setText("Please select only one open table to delete.");
-				return;
+			int deletedCount = 0;
+
+			for (int tableNumber : openSelections) {
+				String result = tableManager.deleteOpenTable(tableNumber);
+
+				if (result.startsWith("Deleted")) {
+					deletedCount++;
+				}
 			}
 
-			int tableNumber = openSelections.get(0);
-			String result = tableManager.deleteOpenTable(tableNumber);
-
-			statusLabel.setText(result);
+			statusLabel.setText("Deleted " + deletedCount + " table(s).");
 			clearSelection();
+			refreshUI();
+		});
+
+		TextField serverNameField = new TextField();
+		serverNameField.setPromptText("Server name");
+
+		Button assignServerButton = new Button("Assign Server to Selected Table(s)");
+		assignServerButton.setMaxWidth(Double.MAX_VALUE);
+
+		assignServerButton.setOnAction(e -> {
+			String serverName = serverNameField.getText().trim();
+
+			if (serverName.isEmpty()) {
+				statusLabel.setText("Enter a server name.");
+				return;
+			}
+
+			if (selectedTableNumbers.isEmpty()) {
+				statusLabel.setText("Select one or more tables first.");
+				return;
+			}
+
+			for (int tableNumber : selectedTableNumbers) {
+				Table table = tableManager.getTable(tableNumber);
+
+				if (table != null) {
+					table.setServerName(serverName);
+				}
+			}
+
+			statusLabel.setText("Assigned " + serverName + " to " + selectedTableNumbers.size() + " table(s).");
+			serverNameField.clear();
 			refreshUI();
 		});
 
@@ -268,8 +326,13 @@ public class Main extends Application {
 
 				new Label("Table Setup"),
 				tableSeatsField,
+				tableQuantityField,
 				addTableButton,
 				deleteTableButton,
+
+				new Label("Server Assignment"),
+				serverNameField,
+				assignServerButton,
 
 				detailsHeader,
 				selectedTableBox,
@@ -295,8 +358,15 @@ public class Main extends Application {
 
 		refreshUI();
 
+		Timeline liveTimer = new Timeline(
+				new KeyFrame(Duration.seconds(1), e -> refreshUI())
+		);
+
+		liveTimer.setCycleCount(Timeline.INDEFINITE);
+		liveTimer.play();
+
 		Scene scene = new Scene(root, 1280, 760);
-		scene.getStylesheets().add(Main.class.getResource("/project/style.css").toExternalForm());
+		scene.getStylesheets().add(Main.class.getResource("/style.css").toExternalForm());
 		stage.setTitle("Restaurant Host Stand");
 		stage.setScene(scene);
 		stage.setMinWidth(1000);
@@ -379,7 +449,54 @@ public class Main extends Application {
 		Label partyLabel = new Label(partyText);
 		partyLabel.setStyle("-fx-text-fill: black;");
 
-		VBox card = new VBox(8, tableNumberLabel, seatsLabel, statusTextLabel, partyLabel);
+		Label serverLabel = new Label("Server: " + table.getServerName());
+
+		Label timerLabel = new Label();
+
+		if (table.getCurrentPartyId() != -1 && table.getSeatedTime() != null) {
+
+			java.time.Duration elapsed =
+					java.time.Duration.between(
+							table.getSeatedTime(),
+							LocalDateTime.now()
+					);
+
+			long hours = elapsed.toHours();
+			long minutes = elapsed.toMinutes() % 60;
+			long seconds = elapsed.getSeconds() % 60;
+
+			timerLabel.setText(
+					String.format("Occupied: %02d:%02d:%02d",
+							hours, minutes, seconds)
+			);
+
+			long totalMinutes = elapsed.toMinutes();
+
+			if (totalMinutes < 30) {
+				timerLabel.getStyleClass().add("timer-green");
+			} else if (totalMinutes < 45) {
+				timerLabel.getStyleClass().add("timer-yellow");
+			} else {
+				timerLabel.getStyleClass().add("timer-red");
+			}
+
+		} else {
+
+			timerLabel.setText("Occupied: --:--:--");
+			timerLabel.getStyleClass().add("timer-empty");
+
+		}
+
+		VBox card = new VBox(
+				8,
+				tableNumberLabel,
+				seatsLabel,
+				statusTextLabel,
+				partyLabel,
+				timerLabel,
+				serverLabel
+		);
+
 		card.getStyleClass().add("table-card");
 
 		if (isSelected) {
@@ -391,7 +508,11 @@ public class Main extends Application {
 		}
 		card.setAlignment(Pos.CENTER);
 		card.setPadding(new Insets(12));
-		card.setPrefSize(135, 115);
+		card.setPrefWidth(170);
+		card.setPrefHeight(165);
+
+		card.setMinWidth(170);
+		card.setMinHeight(165);
 
 		String borderColor = isOpen ? "#1f9d55" : "#d64545";
 		String backgroundColor = isSelected ? "#eaf2ff" : "white";
@@ -503,16 +624,61 @@ public class Main extends Application {
 	private void refreshUI() {
 		tableFloor.getChildren().clear();
 
+		List<Table> openNoServer = new ArrayList<>();
+		List<List<Table>> occupiedNoServer = new ArrayList<>();
+		List<Table> openWithServer = new ArrayList<>();
+		List<List<Table>> occupiedWithServer = new ArrayList<>();
+
 		for (Table table : tableManager.getOpenTableList()) {
-			tableFloor.getChildren().add(createTableCard(table));
+			if (isUnassigned(table)) {
+				openNoServer.add(table);
+			} else {
+				openWithServer.add(table);
+			}
 		}
 
 		for (List<Table> group : tableManager.getOccupiedTableGroups()) {
-			if (group.size() == 1) {
-				tableFloor.getChildren().add(createTableCard(group.get(0)));
-			} else {
-				tableFloor.getChildren().add(createPartyGroupNode(group));
+			boolean groupHasServer = false;
+
+			for (Table table : group) {
+				if (!isUnassigned(table)) {
+					groupHasServer = true;
+					break;
+				}
 			}
+
+			if (groupHasServer) {
+				occupiedWithServer.add(group);
+			} else {
+				occupiedNoServer.add(group);
+			}
+		}
+
+		openNoServer.sort(Comparator.comparingInt(Table::getTblNum));
+		openWithServer.sort(
+				Comparator.comparing(Table::getServerName)
+						.thenComparingInt(Table::getTblNum)
+		);
+
+		occupiedWithServer.sort(
+				Comparator.comparing(group -> group.get(0).getServerName())
+						.thenComparingInt(group -> group.get(0).getTblNum())
+		);
+
+		for (Table table : openNoServer) {
+			tableFloor.getChildren().add(createTableCard(table));
+		}
+
+		for (List<Table> group : occupiedNoServer) {
+			addTableGroupToFloor(group);
+		}
+
+		for (Table table : openWithServer) {
+			tableFloor.getChildren().add(createTableCard(table));
+		}
+
+		for (List<Table> group : occupiedWithServer) {
+			addTableGroupToFloor(group);
 		}
 
 		waitListView.getItems().setAll(tableManager.getWaitListParties());
@@ -562,5 +728,21 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
+	}
+}
+
+private boolean isUnassigned(Table table) {
+	String serverName = table.getServerName();
+
+	return serverName == null
+			|| serverName.trim().isEmpty()
+			|| serverName.equalsIgnoreCase("Unassigned");
+}
+
+private void addTableGroupToFloor(List<Table> group) {
+	if (group.size() == 1) {
+		tableFloor.getChildren().add(createTableCard(group.get(0)));
+	} else {
+		tableFloor.getChildren().add(createPartyGroupNode(group));
 	}
 }
