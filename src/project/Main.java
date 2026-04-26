@@ -270,6 +270,28 @@ public class Main extends Application {
 			refreshUI();
 		});
 
+		Button unassignServerButton = new Button("Unassign Server from Selected Table(s)");
+		unassignServerButton.setMaxWidth(Double.MAX_VALUE);
+
+		unassignServerButton.setOnAction(e -> {
+
+			if (selectedTableNumbers.isEmpty()) {
+				statusLabel.setText("Select one or more tables first.");
+				return;
+			}
+
+			for (int tableNumber : selectedTableNumbers) {
+				Table table = tableManager.getTable(tableNumber);
+
+				if (table != null) {
+					table.setServerName("Unassigned");
+				}
+			}
+
+			statusLabel.setText("Server removed from " + selectedTableNumbers.size() + " table(s).");
+			refreshUI();
+		});
+
 		Button freeSelectedButton = new Button("Free Selected Table Group");
 		freeSelectedButton.setMaxWidth(Double.MAX_VALUE);
 		freeSelectedButton.setOnAction(e -> {
@@ -333,6 +355,7 @@ public class Main extends Application {
 				new Label("Server Assignment"),
 				serverNameField,
 				assignServerButton,
+				unassignServerButton,
 
 				detailsHeader,
 				selectedTableBox,
@@ -366,7 +389,7 @@ public class Main extends Application {
 		liveTimer.play();
 
 		Scene scene = new Scene(root, 1280, 760);
-		scene.getStylesheets().add(Main.class.getResource("/style.css").toExternalForm());
+		scene.getStylesheets().add(Main.class.getResource("/project/style.css").toExternalForm());
 		stage.setTitle("Restaurant Host Stand");
 		stage.setScene(scene);
 		stage.setMinWidth(1000);
@@ -661,8 +684,8 @@ public class Main extends Application {
 		);
 
 		occupiedWithServer.sort(
-				Comparator.comparing(group -> group.get(0).getServerName())
-						.thenComparingInt(group -> group.get(0).getTblNum())
+				Comparator.comparing((List<Table> group) -> group.get(0).getServerName())
+						.thenComparingInt((List<Table> group) -> group.get(0).getTblNum())
 		);
 
 		for (Table table : openNoServer) {
@@ -681,7 +704,13 @@ public class Main extends Application {
 			addTableGroupToFloor(group);
 		}
 
+		Party selectedParty = waitListView.getSelectionModel().getSelectedItem();
+
 		waitListView.getItems().setAll(tableManager.getWaitListParties());
+
+		if (selectedParty != null && waitListView.getItems().contains(selectedParty)) {
+			waitListView.getSelectionModel().select(selectedParty);
+		}
 
 		int openCount = tableManager.getOpenTableCount();
 		int occupiedCount = tableManager.getOccupiedTableCount();
@@ -726,23 +755,23 @@ public class Main extends Application {
 		);
 	}
 
-	public static void main(String[] args) {
-		launch(args);
+	private boolean isUnassigned(Table table) {
+		String serverName = table.getServerName();
+
+		return serverName == null
+				|| serverName.trim().isEmpty()
+				|| serverName.equalsIgnoreCase("Unassigned");
 	}
-}
 
-private boolean isUnassigned(Table table) {
-	String serverName = table.getServerName();
+	private void addTableGroupToFloor(List<Table> group) {
+		if (group.size() == 1) {
+			tableFloor.getChildren().add(createTableCard(group.get(0)));
+		} else {
+			tableFloor.getChildren().add(createPartyGroupNode(group));
+		}
+	}
 
-	return serverName == null
-			|| serverName.trim().isEmpty()
-			|| serverName.equalsIgnoreCase("Unassigned");
-}
-
-private void addTableGroupToFloor(List<Table> group) {
-	if (group.size() == 1) {
-		tableFloor.getChildren().add(createTableCard(group.get(0)));
-	} else {
-		tableFloor.getChildren().add(createPartyGroupNode(group));
+	public static void main(String[] args) {
+		Application.launch(args);
 	}
 }
