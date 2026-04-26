@@ -1,49 +1,61 @@
-public class Table{
+package project;
+
+public class Table {
 	private int tblNum;
 	private int size;
-	private double weight;
-	
-	public Table(int num, int size, double weight) {
+	private int weight;
+	private int currentPartyId;
+
+	public Table(int num, int size) {
 		this.tblNum = num;
 		this.size = size;
-		this.weight = weight;
+		this.weight = 0;
+		this.currentPartyId = -1;
 	}
-	
-	public int getTblNum(){
-		return this.tblNum;
+
+	public int getTblNum() {
+		return tblNum;
 	}
-	public void setTblNum(int tblNmbr) {
-		this.tblNum = tblNmbr;
+
+	public void setTblNum(int tblNum) {
+		this.tblNum = tblNum;
 	}
-	
+
 	public int getSize() {
-		return this.size;
+		return size;
 	}
+
 	public void setSize(int size) {
 		this.size = size;
 	}
 
-	public double getWeight(){
-		return this.weight;
+	public int getWeight() {
+		return weight;
 	}
-	public void setWeight(double weight){
+
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
-	
+
+	public int getCurrentPartyId() {
+		return currentPartyId;
+	}
+
+	public void setCurrentPartyId(int currentPartyId) {
+		this.currentPartyId = currentPartyId;
+	}
+
 	@Override
 	public boolean equals(Object o) {
-	    if (this == o) {
-	    	return true;
-	    }
-	    if (!(o instanceof Table)) {
-	    	return false;
-	    }
-	    Table other = (Table) o;
-	    return this.tblNum == other.tblNum;
+		if (this == o) return true;
+		if (!(o instanceof Table)) return false;
+
+		Table other = (Table) o;
+		return tblNum == other.tblNum;
 	}
-	
+
+	@Override
 	public String toString() {
-		String msg = "Table " + getTblNum();
-		return msg;
+		return "Table " + tblNum;
 	}
 }
