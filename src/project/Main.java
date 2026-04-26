@@ -364,19 +364,27 @@ public class Main extends Application {
 				waitHeader,
 				waitListView
 		);
+
 		rightPanel.setPadding(new Insets(10));
 		rightPanel.setPrefWidth(320);
 		rightPanel.setMinWidth(320);
 		rightPanel.setMaxWidth(320);
 		rightPanel.getStyleClass().add("panel");
 
+		ScrollPane rightScrollPane = new ScrollPane(rightPanel);
+		rightScrollPane.setFitToWidth(true);
+		rightScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		rightScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+		rightScrollPane.setPrefWidth(340);
+		rightScrollPane.setMinWidth(340);
+
 		BorderPane root = new BorderPane();
 		root.setTop(topSection);
 		root.setCenter(floorScrollPane);
-		root.setRight(rightPanel);
+		root.setRight(rightScrollPane);
 		root.setPadding(new Insets(15));
 
-		BorderPane.setMargin(rightPanel, new Insets(0, 0, 0, 15));
+		BorderPane.setMargin(rightScrollPane, new Insets(0, 0, 0, 15));
 		VBox.setVgrow(floorScrollPane, Priority.ALWAYS);
 
 		refreshUI();
@@ -519,6 +527,7 @@ public class Main extends Application {
 				timerLabel,
 				serverLabel
 		);
+
 
 		card.getStyleClass().add("table-card");
 
