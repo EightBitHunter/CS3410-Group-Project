@@ -310,6 +310,21 @@ public class TableManager {
 		return null;
 	}
 
+	public String deleteOpenTable(int tableNumber) {
+		Table table = getTable(tableNumber);
+
+		if (table == null) {
+			return "Table " + tableNumber + " does not exist.";
+		}
+
+		if (!isTableOpen(tableNumber)) {
+			return "Table " + tableNumber + " is occupied and cannot be deleted.";
+		}
+
+		openTbls.remove(table);
+		return "Deleted Table " + tableNumber + ".";
+	}
+
 	public boolean isTableOpen(int num) {
 		for (int i = 0; i < openTbls.size(); i++) {
 			Table t = (Table) openTbls.get(i);

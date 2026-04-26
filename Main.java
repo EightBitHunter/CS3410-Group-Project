@@ -3,7 +3,6 @@ package project;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -26,6 +25,7 @@ public class Main extends Application {
 
 	private TableManager tableManager;
 	private int nextPartyId = 1;
+	private int nextTableNumber = 11;
 
 	private final FlowPane tableFloor = new FlowPane();
 	private final ListView<Party> waitListView = new ListView<>();
@@ -44,20 +44,23 @@ public class Main extends Application {
 	public void start(Stage stage) {
 		tableManager = new TableManager();
 
-		Random rand = new Random();
-		for (int i = 0; i < 40; i++) {
-			int seats = rand.nextInt(8) + 1;
-			tableManager.addTable(new Table(i + 1, seats));
+		for (int i = 0; i < 10; i++) {
+			tableManager.addTable(new Table(i + 1, 4));
 		}
 
 		Label titleLabel = new Label("Restaurant Host Stand");
-		titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+		titleLabel.getStyleClass().add("app-title");
+
+		Label subtitleLabel = new Label("Manage tables, parties, waitlist, and seating assignments");
+		subtitleLabel.getStyleClass().add("app-subtitle");
 
 		HBox summaryBar = new HBox(20, openCountLabel, occupiedCountLabel, waitCountLabel);
+		openCountLabel.getStyleClass().add("summary-card");
+		occupiedCountLabel.getStyleClass().add("summary-card");
+		waitCountLabel.getStyleClass().add("summary-card");
 		summaryBar.setAlignment(Pos.CENTER_LEFT);
 
-		VBox topSection = new VBox(10, titleLabel, summaryBar, statusLabel);
-		topSection.setPadding(new Insets(0, 0, 10, 0));
+		VBox topSection = new VBox(6, titleLabel, subtitleLabel, summaryBar, statusLabel);		topSection.setPadding(new Insets(0, 0, 10, 0));
 
 		tableFloor.setHgap(12);
 		tableFloor.setVgap(12);
@@ -66,12 +69,7 @@ public class Main extends Application {
 
 		VBox floorContent = new VBox(10, createLegend(), tableFloor);
 		floorContent.setPadding(new Insets(10));
-		floorContent.setStyle(
-				"-fx-background-color: #f7f7f7;" +
-						"-fx-border-color: #d9d9d9;" +
-						"-fx-border-radius: 10;" +
-						"-fx-background-radius: 10;"
-		);
+		floorContent.getStyleClass().add("panel");
 
 		ScrollPane floorScrollPane = new ScrollPane(floorContent);
 		floorScrollPane.setFitToWidth(false);
@@ -158,6 +156,62 @@ public class Main extends Application {
 			refreshUI();
 		});
 
+		TextField tableSeatsField = new TextField();
+		tableSeatsField.setPromptText("Seats for new table");
+
+		Button addTableButton = new Button("Add Table");
+		addTableButton.setMaxWidth(Double.MAX_VALUE);
+		addTableButton.setOnAction(e -> {
+			String text = tableSeatsField.getText().trim();
+
+			if (text.isEmpty()) {
+				statusLabel.setText("Enter the number of seats for the new table.");
+				return;
+			}
+
+			try {
+				int seats = Integer.parseInt(text);
+
+				if (seats <= 0) {
+					statusLabel.setText("Table seats must be greater than 0.");
+					return;
+				}
+
+				Table newTable = new Table(nextTableNumber++, seats);
+				tableManager.addTable(newTable);
+
+				tableSeatsField.clear();
+				statusLabel.setText("Added Table " + newTable.getTblNum() + " with " + seats + " seats.");
+				refreshUI();
+
+			} catch (NumberFormatException ex) {
+				statusLabel.setText("Table seats must be a number.");
+			}
+		});
+
+		Button deleteTableButton = new Button("Delete Selected Open Table");
+		deleteTableButton.setMaxWidth(Double.MAX_VALUE);
+		deleteTableButton.setOnAction(e -> {
+			List<Integer> openSelections = getSelectedOpenTableNumbers();
+
+			if (openSelections.isEmpty()) {
+				statusLabel.setText("Select an open table to delete.");
+				return;
+			}
+
+			if (openSelections.size() > 1) {
+				statusLabel.setText("Please select only one open table to delete.");
+				return;
+			}
+
+			int tableNumber = openSelections.get(0);
+			String result = tableManager.deleteOpenTable(tableNumber);
+
+			statusLabel.setText(result);
+			clearSelection();
+			refreshUI();
+		});
+
 		Button freeSelectedButton = new Button("Free Selected Table Group");
 		freeSelectedButton.setMaxWidth(Double.MAX_VALUE);
 		freeSelectedButton.setOnAction(e -> {
@@ -183,10 +237,10 @@ public class Main extends Application {
 		});
 
 		Label controlsHeader = new Label("Host Controls");
-		controlsHeader.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+		controlsHeader.getStyleClass().add("section-header");
 
 		Label detailsHeader = new Label("Selected Tables");
-		detailsHeader.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+		detailsHeader.getStyleClass().add("section-header");
 
 		VBox selectedTableBox = new VBox(6, selectedTableLabel, selectedTableInfoLabel);
 		selectedTableBox.setPadding(new Insets(10));
@@ -198,7 +252,7 @@ public class Main extends Application {
 		);
 
 		Label waitHeader = new Label("Waitlist");
-		waitHeader.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+		waitHeader.getStyleClass().add("section-header");
 
 		waitListView.setPrefHeight(250);
 		waitListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -211,6 +265,12 @@ public class Main extends Application {
 				addPartyButton,
 				seatWaitlistPartyButton,
 				removeWaitlistPartyButton,
+
+				new Label("Table Setup"),
+				tableSeatsField,
+				addTableButton,
+				deleteTableButton,
+
 				detailsHeader,
 				selectedTableBox,
 				freeSelectedButton,
@@ -222,12 +282,7 @@ public class Main extends Application {
 		rightPanel.setPrefWidth(320);
 		rightPanel.setMinWidth(320);
 		rightPanel.setMaxWidth(320);
-		rightPanel.setStyle(
-				"-fx-background-color: #f7f7f7;" +
-						"-fx-border-color: #d9d9d9;" +
-						"-fx-border-radius: 10;" +
-						"-fx-background-radius: 10;"
-		);
+		rightPanel.getStyleClass().add("panel");
 
 		BorderPane root = new BorderPane();
 		root.setTop(topSection);
@@ -241,6 +296,7 @@ public class Main extends Application {
 		refreshUI();
 
 		Scene scene = new Scene(root, 1280, 760);
+		scene.getStylesheets().add(Main.class.getResource("/project/style.css").toExternalForm());
 		stage.setTitle("Restaurant Host Stand");
 		stage.setScene(scene);
 		stage.setMinWidth(1000);
@@ -324,6 +380,15 @@ public class Main extends Application {
 		partyLabel.setStyle("-fx-text-fill: black;");
 
 		VBox card = new VBox(8, tableNumberLabel, seatsLabel, statusTextLabel, partyLabel);
+		card.getStyleClass().add("table-card");
+
+		if (isSelected) {
+			card.getStyleClass().add("selected-table");
+		} else if (isOpen) {
+			card.getStyleClass().add("open-table");
+		} else {
+			card.getStyleClass().add("occupied-table");
+		}
 		card.setAlignment(Pos.CENTER);
 		card.setPadding(new Insets(12));
 		card.setPrefSize(135, 115);
@@ -331,14 +396,6 @@ public class Main extends Application {
 		String borderColor = isOpen ? "#1f9d55" : "#d64545";
 		String backgroundColor = isSelected ? "#eaf2ff" : "white";
 		String borderWidth = isSelected ? "4" : "3";
-
-		card.setStyle(
-				"-fx-background-color: " + backgroundColor + ";" +
-						"-fx-border-color: " + borderColor + ";" +
-						"-fx-border-width: " + borderWidth + ";" +
-						"-fx-border-radius: 12;" +
-						"-fx-background-radius: 12;"
-		);
 
 		card.setOnMouseClicked(e -> {
 			if (selectedTableNumbers.contains(table.getTblNum())) {
