@@ -1,16 +1,21 @@
 package project;
+import java.time.LocalDateTime;
 
 public class Table {
 	private int tblNum;
 	private int size;
 	private int weight;
 	private int currentPartyId;
+	private LocalDateTime seatedTime;
+	private String serverName;
 
 	public Table(int num, int size) {
 		this.tblNum = num;
 		this.size = size;
 		this.weight = 0;
 		this.currentPartyId = -1;
+		this.seatedTime = null;
+		this.serverName = "Unassigned";
 	}
 
 	public int getTblNum() {
@@ -42,7 +47,27 @@ public class Table {
 	}
 
 	public void setCurrentPartyId(int currentPartyId) {
+
 		this.currentPartyId = currentPartyId;
+
+		if (currentPartyId == -1) {
+			this.seatedTime = null;
+		} else {
+			this.seatedTime = LocalDateTime.now();
+		}
+
+	}
+
+	public LocalDateTime getSeatedTime() {
+		return seatedTime;
+	}
+
+	public String getServerName() {
+		return serverName;
+	}
+
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
 	}
 
 	@Override
